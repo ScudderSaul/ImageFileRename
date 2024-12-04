@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>True</UseWindowsForms>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="MainWindow.cs" />
+    <Compile Remove="MainWindownot.xaml.cs" />
+    <Compile Remove="MainWindowold.xaml.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="NullFX.CRC" Version="1.1.10" />
+  </ItemGroup>
+</Project>
