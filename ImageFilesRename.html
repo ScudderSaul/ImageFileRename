@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace Description</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+        }
+
+        h1, h2, h3 {
+            color: #333;
+        }
+
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ddd;
+            overflow-x: auto;
+        }
+
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Workspace Description</h1>
+    <p>This document provides an overview of the current workspace, including the project characteristics and the main components of the solution.</p>
+
+    <h2>Project Characteristics</h2>
+    <ul>
+        <li><strong>Target Framework:</strong> .NET 9</li>
+        <li><strong>Programming Language:</strong> C# (version 13.0)</li>
+        <li><strong>Project Type:</strong> WPF (Windows Presentation Foundation)</li>
+    </ul>
+
+    <h2>Main Components</h2>
+    <h3>File: MainWindow.xaml.cs</h3>
+    <p>The <code>MainWindow.xaml.cs</code> file contains the main logic for the WPF application. It includes the following key components:</p>
+    <ul>
+        <li><strong>Class Definition:</strong> <code>public partial class MainWindow : Window</code></li>
+        <li><strong>Constructor:</strong> Initializes the window, sets up the initial display format, and binds the PNG file list to a UI element.</li>
+        <li>
+            <strong>Fields:</strong>
+            <ul>
+                <li><code>_rnd:</code> A <code>Random</code> instance used to generate random numbers.</li>
+                <li><code>_prefixName:</code> A string to store the prefix for renamed files.</li>
+                <li><code>PngFilesInFolder</code> and <code>JpgFilesInFolder:</code> Lists to store file paths of PNG and JPG files in the selected folder.</li>
+                <li><code>PngData</code> and <code>JpgData:</code> Observable collections to bind the file lists to UI elements.</li>
+                <li><code>_formatString:</code> A string to store the current format for renaming files.</li>
+            </ul>
+        </li>
+        <li>
+            <strong>Properties:</strong>
+            <ul>
+                <li><code>PrefixName:</code> A property to get or set the <code>_prefixName</code> field and update the <code>PrefixTextBox</code> UI element.</li>
+            </ul>
+        </li>
+        <li>
+            <strong>Methods:</strong>
+            <ul>
+                <li><code>GetPngFilePathsInFolderAsync()</code> and <code>GetJpgFilePathsInFolderAsync():</code> Retrieve the file paths of PNG and JPG files in the selected folder, respectively, and store them in their corresponding lists and observable collections.</li>
+                <li><code>ShowPngList()</code> and <code>ShowJpgList():</code> Bind the observable collections (<code>PngData</code> and <code>JpgData</code>) to the UI elements (<code>PngShowList</code> and <code>JpgShowList</code>) to display the file lists.</li>
+                <li><code>RenameFileAsync(string oldName, string newName):</code> Renames a file from <code>oldName</code> to <code>newName</code>, handling any exceptions that may occur.</li>
+                <li><code>RenameButton_OnClick(object sender, RoutedEventArgs e):</code> Handles the renaming process when the rename button is clicked. It generates new file names based on the selected options (prefix, CRC, or date-time) and renames the files accordingly.</li>
+                <li><code>ChooseSource_OnClick(object sender, RoutedEventArgs e):</code> Opens a folder browser dialog to select the source folder and updates the file lists.</li>
+                <li><code>ShowFormat():</code> Updates the <code>_formatString</code> based on the selected options (CRC or date-time) and displays it in the <code>FormatTextBox</code> UI element.</li>
+                <li><code>Crc(string path):</code> Calculates the CRC checksum of a file and returns it as a string.</li>
+            </ul>
+        </li>
+        <li>
+            <strong>Event Handlers:</strong>
+            <ul>
+                <li><code>CrcBox_OnChecked</code>, <code>CrcBox_OnUnchecked</code>, <code>DateTimeBox_OnChecked</code>, <code>DateTimeBox_OnUnchecked:</code> Handle the checking and unchecking of the CRC and date-time options, updating the format string accordingly.</li>
+                <li><code>ShowListButton_OnClick:</code> Displays the appropriate file list (PNG or JPG) based on the selected options.</li>
+                <li><code>PngCheck_OnClick</code>, <code>JpgCheck_OnClick:</code> Handle the checking of the PNG and JPG options, updating the file lists and the rename button content.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h2>Referenced Types</h2>
+    <h3>PngObservable</h3>
+    <pre><code>public class PngObservable : ObservableCollection&lt;string&gt; { 
+    public PngObservable(List&lt;string&gt; pngFiles);
+    public void Add(string st);
+}</code></pre>
+
+    <h3>JpgObservable</h3>
+    <pre><code>public class JpgObservable : ObservableCollection&lt;string&gt; { 
+    public JpgObservable(List&lt;string&gt; jpgFiles);
+    public void Add(string st);
+}</code></pre>
+
+    <h2>Summary</h2>
+    <p>The <code>MainWindow</code> class provides a user interface for selecting a folder, displaying lists of PNG and JPG files, and renaming these files based on user-defined options (prefix, CRC, or date-time). The class uses observable collections to bind the file lists to UI elements, ensuring that the UI updates automatically when the file lists change.</p>
+</body>
+</html>

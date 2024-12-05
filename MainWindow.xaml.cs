@@ -27,43 +27,6 @@ using Path = System.Windows.Shapes.Path;
 
 
 
-//The MainWindow class in the provided code is a part of a WPF application designed to rename image files (specifically PNG and JPG files) in a selected folder. Here's a breakdown of how the code works:
-//Class and Constructor
-//•	Class Definition: public partial class MainWindow : Window
-//•	This class inherits from Window, indicating it is a WPF window.
-//•	Constructor: public MainWindow()
-//•	Initializes the window, sets up the initial display format, and binds the PNG file list to a UI element.
-//Fields and Properties
-//•	Fields:
-//•	_rnd: A Random instance used to generate random numbers.
-//•	_prefixName: A string to store the prefix for renamed files.
-//•	PngFilesInFolder and JpgFilesInFolder: Lists to store file paths of PNG and JPG files in the selected folder.
-//•	PngData and JpgData: Observable collections to bind the file lists to UI elements.
-//•	_formatString: A string to store the current format for renaming files.
-//•	Properties:
-//•	PrefixName: A property to get or set the _prefixName field and update the PrefixTextBox UI element.
-//Methods
-//•	GetPngFilePathsInFolder() and GetJpgFilePathsInFolder():
-//•	These methods retrieve the file paths of PNG and JPG files in the selected folder, respectively, and store them in their corresponding lists and observable collections.
-//•	ShowPngList() and ShowJpgList():
-//•	These methods bind the observable collections (PngData and JpgData) to the UI elements (PngShowList and JpgShowList) to display the file lists.
-//•	RenameFile(string oldName, string newName):
-//•	This method renames a file from oldName to newName, handling any exceptions that may occur.
-//•	RenameButton_OnClick(object sender, RoutedEventArgs e):
-//•	This method handles the renaming process when the rename button is clicked. It generates new file names based on the selected options (prefix, CRC, or date-time) and renames the files accordingly.
-//•	ChooseSource_OnClick(object sender, RoutedEventArgs e):
-//•	This method opens a folder browser dialog to select the source folder and updates the file lists.
-//•	ShowFormat():
-//•	This method updates the _formatString based on the selected options (CRC or date-time) and displays it in the FormatTextBox UI element.
-//•	Crc(string path):
-//•	This method calculates the CRC checksum of a file and returns it as a string.
-//•	Event Handlers:
-//•	CrcBox_OnChecked, CrcBox_OnUnchecked, DateTimeBox_OnChecked, DateTimeBox_OnUnchecked: These methods handle the checking and unchecking of the CRC and date-time options, updating the format string accordingly.
-//•	ShowListButton_OnClick: This method displays the appropriate file list (PNG or JPG) based on the selected options.
-//•	PngCheck_OnClick, JpgCheck_OnClick: These methods handle the checking of the PNG and JPG options, updating the file lists and the rename button content.
-//Summary
-//The MainWindow class provides a user interface for selecting a folder, displaying lists of PNG and JPG files, and renaming these files based on user - defined options(prefix, CRC, or date - time).The class uses observable collections to bind the file lists to UI elements, ensuring that the UI updates automatically when the file lists change.
-
 
 
 namespace ImageFileRename
