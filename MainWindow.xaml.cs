@@ -95,10 +95,9 @@ namespace ImageFileRename
         }
         List<string> PngFilesInFolder = new List<string>();
         private PngObservable PngData = null;
-        public bool GetPngFilePathsInFolder()
+        public async Task<bool> GetPngFilePathsInFolderAsync()
         {
             PngFilesInFolder = new List<string>();
-            
 
             string path = SourcePathTextBlock.Text;
             if (string.IsNullOrEmpty(path))
@@ -106,11 +105,10 @@ namespace ImageFileRename
                 MessageBox.Show("Please select a folder path");
                 return false;
             }
-            string[] PngFiles = System.IO.Directory.GetFiles(path, "*.png");
+            string[] PngFiles = await Task.Run(() => System.IO.Directory.GetFiles(path, "*.png"));
             foreach (string PngFile in PngFiles)
             {
                 PngFilesInFolder.Add(PngFile);
-               
             }
             PngData = new PngObservable(PngFilesInFolder);
 
@@ -120,21 +118,20 @@ namespace ImageFileRename
         List<string> JpgFilesInFolder = new List<string>();
         private JpgObservable JpgData = null;
 
-        public bool GetJpgFilePathsInFolder()
+        public async Task<bool> GetJpgFilePathsInFolderAsync()
         {
             JpgFilesInFolder = new List<string>();
-           
+
             string path = SourcePathTextBlock.Text;
             if (string.IsNullOrEmpty(path))
             {
                 MessageBox.Show("Please select a folder path");
                 return false;
             }
-            string[] JpgFiles = System.IO.Directory.GetFiles(path, "*.jpg");
+            string[] JpgFiles = await Task.Run(() => System.IO.Directory.GetFiles(path, "*.jpg"));
             foreach (string JpgFile in JpgFiles)
             {
                 JpgFilesInFolder.Add(JpgFile);
-                
             }
             JpgData = new JpgObservable(JpgFilesInFolder);
 
@@ -150,14 +147,13 @@ namespace ImageFileRename
 
         void ShowJpgList()
         {
-
             Binding JpgBinding = new Binding();
             JpgBinding.Source = JpgData;
             JpgShowList.SetBinding(ItemsControl.ItemsSourceProperty, JpgBinding); ;
         }
 
         // rename a file
-        public void RenameFile(string oldName, string newName)
+        public async Task RenameFileAsync(string oldName, string newName)
         {
             try
             {
@@ -165,7 +161,7 @@ namespace ImageFileRename
                 {
                     return;
                 }
-                System.IO.File.Move(oldName, newName);
+                await Task.Run(() => System.IO.File.Move(oldName, newName));
             }
             catch (Exception e)
             {
@@ -173,10 +169,9 @@ namespace ImageFileRename
             }
         }
 
-        private void RenameButton_OnClick(object sender, RoutedEventArgs e)
+        private async void RenameButton_OnClick(object sender, RoutedEventArgs e)
         {
             int cnt = _rnd.Next(10000, 99999);
-
             string changedfilename = string.Empty;
 
             if (PrefixTextBox.Text != "")
@@ -184,15 +179,36 @@ namespace ImageFileRename
                 PrefixName = PrefixTextBox.Text;
             }
 
-
             PngFilesInFolder.Clear();
             JpgFilesInFolder.Clear();
+            StatusTextBlock.Text = "Renaming files...";
+            RenameProgressBar.Value = 0;
+
+            int totalFiles = 0;
             if (PngCheck.IsChecked == true)
             {
-                if (GetPngFilePathsInFolder() == false)
+                if (await GetPngFilePathsInFolderAsync() == false)
                 {
+                    StatusTextBlock.Text = "Failed to get PNG files.";
                     return;
                 }
+                totalFiles += PngFilesInFolder.Count;
+            }
+
+            if (JpgCheck.IsChecked == true)
+            {
+                if (await GetJpgFilePathsInFolderAsync() == false)
+                {
+                    StatusTextBlock.Text = "Failed to get JPG files.";
+                    return;
+                }
+                totalFiles += JpgFilesInFolder.Count;
+            }
+
+            int processedFiles = 0;
+
+            if (PngCheck.IsChecked == true)
+            {
                 foreach (var fff in PngFilesInFolder)
                 {
                     if (DateTimeBox.IsChecked == true)
@@ -220,18 +236,16 @@ namespace ImageFileRename
                     string npf = inf.DirectoryName + "\\" + changedfilename + ".png";
                     if (fff != npf)
                     {
-
-                        RenameFile(fff, npf);
+                        await RenameFileAsync(fff, npf);
                     }
+
+                    processedFiles++;
+                    RenameProgressBar.Value = (double)processedFiles / totalFiles * 100;
                 }
             }
 
             if (JpgCheck.IsChecked == true)
             {
-                if (GetJpgFilePathsInFolder() == false)
-                {
-                    return;
-                }
                 foreach (var fff in JpgFilesInFolder)
                 {
                     if (DateTimeBox.IsChecked == true)
@@ -256,14 +270,19 @@ namespace ImageFileRename
                     }
 
                     FileInfo inf = new FileInfo(fff);
-                    string npf = inf.DirectoryName + "\\" + changedfilename + ".png";
+                    string npf = inf.DirectoryName + "\\" + changedfilename + ".jpg";
                     if (fff != npf)
                     {
-
-                        RenameFile(fff, npf);
+                        await RenameFileAsync(fff, npf);
                     }
+
+                    processedFiles++;
+                    RenameProgressBar.Value = (double)processedFiles / totalFiles * 100;
                 }
             }
+
+            StatusTextBlock.Text = "Renaming completed.";
+            RenameProgressBar.Value = 0; // Reset the progress bar
         }
 
         // chose a source folder path
@@ -273,7 +292,7 @@ namespace ImageFileRename
             dialog.ShowDialog();
             SourcePathTextBlock.Text = dialog.SelectedPath;
             ShowFormat();
-            GetPngFilePathsInFolder();
+            GetPngFilePathsInFolderAsync();
         }
 
         private string _formatString = "Prefix_Count";
@@ -298,11 +317,9 @@ namespace ImageFileRename
             FormatTextBox.Text = _formatString;
         }
 
-
         // get file crc
         private string Crc(string path)
         {
-
             if (string.IsNullOrEmpty(path))
             {
                 return string.Empty;
@@ -350,7 +367,6 @@ namespace ImageFileRename
 
                 PngShowList.Visibility = Visibility.Visible;
                 ShowPngList();
-                
             }
             if (JpgCheck.IsChecked == true)
             {
@@ -358,25 +374,24 @@ namespace ImageFileRename
                 JpgShowList.Visibility = Visibility.Visible;
                 ShowJpgList();
             }
-
         }
 
         private void PngCheck_OnClick(object sender, RoutedEventArgs e)
         {
             JpgCheck.IsChecked = false;
             PngFilesInFolder.Clear();
-            GetPngFilePathsInFolder();
+            GetPngFilePathsInFolderAsync();
             ShowPngList();
             RenameButton.Content = "Rename All .png Files";
         }
 
         private void JpgCheck_OnClick(object sender, RoutedEventArgs e)
         {
-           PngCheck.IsChecked= false;
-           JpgFilesInFolder.Clear();
-           GetJpgFilePathsInFolder();
-           ShowJpgList();
-           RenameButton.Content = "Rename All .jpg Files";
+            PngCheck.IsChecked = false;
+            JpgFilesInFolder.Clear();
+            GetJpgFilePathsInFolderAsync();
+            ShowJpgList();
+            RenameButton.Content = "Rename All .jpg Files";
         }
     }
 }

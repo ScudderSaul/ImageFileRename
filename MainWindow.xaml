@@ -8,94 +8,91 @@
         Title="Change Png Names" FontSize="14" Height="450" Width="800" FontWeight="Bold">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="4*"/>
-            <RowDefinition Height="4*"/>
-            <RowDefinition Height="5*"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <GroupBox Grid.Row="0" Grid.Column="0" Background="Azure" BorderBrush="DarkGreen" BorderThickness="1">
+        <!-- Source Folder Selection -->
+        <GroupBox Grid.Row="0" Grid.Column="0" Background="Azure" BorderBrush="DarkGreen" BorderThickness="1" Margin="5">
             <GroupBox.Header>
-                <Button x:Name="ChooseSource" 
-                        Background="Goldenrod"
-                        Content="Choose Source Folder Path" Click="ChooseSource_OnClick"  Height="30" />
-               
+                <TextBlock Text="Source Folder" FontWeight="Bold"/>
             </GroupBox.Header>
-
-            <StackPanel Orientation="Horizontal" Margin="3">
-
-                <TextBlock x:Name="SourcePathTextBlock" Width="280"  Height="40" Margin="2"/>
-
-              
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <Button x:Name="ChooseSource" Background="Goldenrod" Content="Choose Source Folder Path" Click="ChooseSource_OnClick" Height="30" Width="200"/>
+                <TextBlock x:Name="SourcePathTextBlock" Width="280" Height="30" Margin="5,0,0,0" VerticalAlignment="Center"/>
             </StackPanel>
         </GroupBox>
 
-        <GroupBox  Grid.Row="1" Margin="3" Grid.Column="0" BorderBrush="DarkGreen" BorderThickness="1">
+        <!-- Prefix and Format -->
+        <GroupBox Grid.Row="1" Grid.Column="0" BorderBrush="DarkGreen" BorderThickness="1" Margin="5">
             <GroupBox.Header>
-                <Label Content="Prefix:"  FontWeight="Bold" Background="GreenYellow" Height="40"  Margin="2"/>
+                <TextBlock Text="Prefix" FontWeight="Bold"/>
             </GroupBox.Header>
-
-            <TextBox x:Name="PrefixTextBox" Width="200" Height="40" HorizontalAlignment="Left" BorderBrush="DarkGreen" BorderThickness="1"/>
+            <StackPanel Margin="5">
+                <TextBox x:Name="PrefixTextBox" Width="200" Height="30" HorizontalAlignment="Left" BorderBrush="DarkGreen" BorderThickness="1"/>
+            </StackPanel>
         </GroupBox>
 
-        <GroupBox  Grid.Row="1"  Margin="3" Grid.Column="1" BorderBrush="DarkGreen" BorderThickness="1">
+        <GroupBox Grid.Row="1" Grid.Column="1" BorderBrush="DarkGreen" BorderThickness="1" Margin="5">
             <GroupBox.Header>
-                <Label Content="Current Format:"  FontWeight="Bold" Background="GreenYellow" Height="40"  Margin="2"/>
+                <TextBlock Text="Current Format" FontWeight="Bold"/>
             </GroupBox.Header>
-
-            <TextBox x:Name="FormatTextBox" Width="200" Height="40" HorizontalAlignment="Left"  BorderBrush="DarkGreen" BorderThickness="1"/>
+            <StackPanel Margin="5">
+                <TextBox x:Name="FormatTextBox" Width="200" Height="30" HorizontalAlignment="Left" BorderBrush="DarkGreen" BorderThickness="1" IsReadOnly="True"/>
+            </StackPanel>
         </GroupBox>
-        <GroupBox Grid.Row="0" Grid.Column="1">
-            <GroupBox.Header>
-                <Button x:Name="RenameButton"  FontSize="16" Margin="3" Width ="220" 
-                        VerticalAlignment="Top"
-                        Content="Rename All .png Files" Click="RenameButton_OnClick" HorizontalAlignment="Left" Height="25"  Background="Goldenrod"/>
-            </GroupBox.Header>
 
-            <StackPanel Orientation="Vertical" Margin="3">
-               
+        <!-- Rename Button and File Type Selection -->
+        <GroupBox Grid.Row="0" Grid.Column="1" BorderBrush="DarkGreen" BorderThickness="1" Margin="5">
+            <GroupBox.Header>
+                <TextBlock Text="Rename Files" FontWeight="Bold"/>
+            </GroupBox.Header>
+            <StackPanel Margin="5">
+                <Button x:Name="RenameButton" FontSize="16" Width="220" Content="Rename All .png Files" Click="RenameButton_OnClick" Background="Goldenrod" Margin="0,0,0,5"/>
                 <StackPanel Orientation="Horizontal">
-                    <CheckBox x:Name="PngCheck" IsChecked="True" Content=".png" Click="PngCheck_OnClick"></CheckBox>
-                    <CheckBox x:Name="JpgCheck" IsChecked="False" Content=".jpg" Click="JpgCheck_OnClick"></CheckBox>
+                    <CheckBox x:Name="PngCheck" IsChecked="True" Content=".png" Click="PngCheck_OnClick" Margin="0,0,10,0"/>
+                    <CheckBox x:Name="JpgCheck" IsChecked="False" Content=".jpg" Click="JpgCheck_OnClick"/>
                 </StackPanel>
-
             </StackPanel>
         </GroupBox>
-      
 
 
-        <GroupBox Grid.Column="0" Grid.Row="2" BorderBrush="DarkGreen" BorderThickness="1">
+
+        <!-- Format Selection -->
+        <GroupBox Grid.Row="2" Grid.Column="0" BorderBrush="DarkGreen" BorderThickness="1" Margin="5">
             <GroupBox.Header>
-                <Label Content=" Choose Format:"  FontWeight="Bold" Background="GreenYellow" Height="40"  Margin="2"/>
-
+                <TextBlock Text="Choose Format" FontWeight="Bold"/>
             </GroupBox.Header>
-            <StackPanel  Orientation="Vertical" Margin="3" >
-                <CheckBox x:Name="CrcBox" Content="Use Format Prefix + crc" Checked="CrcBox_OnChecked" Unchecked="CrcBox_OnUnchecked"  
-                          Height="40"  Background="Chartreuse"/>
-                <CheckBox x:Name="DateTimeBox" Content="Use Format Prefix + ticks%10000 + count" Checked="DateTimeBox_OnChecked"  
-                          Unchecked="DateTimeBox_OnUnchecked" 
-                          Height="40"  Background="Chartreuse"/>
+            <StackPanel Margin="5">
+                <CheckBox x:Name="CrcBox" Content="Use Format Prefix + crc" Checked="CrcBox_OnChecked" Unchecked="CrcBox_OnUnchecked" Background="Chartreuse" Margin="0,0,0,5"/>
+                <CheckBox x:Name="DateTimeBox" Content="Use Format Prefix + ticks%10000 + count" Checked="DateTimeBox_OnChecked" Unchecked="DateTimeBox_OnUnchecked" Background="Chartreuse"/>
             </StackPanel>
         </GroupBox>
 
-        <GroupBox Grid.Column="1" Grid.Row="2" x:Name="ListGroup">
+        <!-- File List Display -->
+        <GroupBox Grid.Row="2" Grid.Column="1" BorderBrush="DarkGreen" BorderThickness="1" Margin="5">
             <GroupBox.Header>
-                <StackPanel Orientation="Horizontal">
-                    <Button x:Name="ShowListButton"  Content="Show List" Click="ShowListButton_OnClick"></Button>
-                </StackPanel>
+                <TextBlock Text="File List" FontWeight="Bold"/>
             </GroupBox.Header>
-            <StackPanel Orientation="Horizontal" Margin="3">
-                <ListView x:Name="JpgShowList"  Margin="2"  Width="400" Visibility="Collapsed">
-                   
-                </ListView>
-                <ListView x:Name="PngShowList"  Margin="2"  Width="400" Visibility="Visible" >
-                    
-                </ListView>
+            <StackPanel Margin="5">
+                <Button x:Name="ShowListButton" Content="Show List" Click="ShowListButton_OnClick" Width="100" Margin="0,0,0,5"/>
+                <ListView x:Name="JpgShowList" Margin="2" Width="400" Visibility="Collapsed"/>
+                <ListView x:Name="PngShowList" Margin="2" Width="400" Visibility="Visible"/>
             </StackPanel>
         </GroupBox>
+
+        <!-- Progress Bar -->
+        <ProgressBar x:Name="RenameProgressBar" Grid.Row="3" Grid.ColumnSpan="2" Height="20" Margin="5" Minimum="0" Maximum="100" Value="0"/>
+
+        <!-- Status Indicator -->
+        <TextBlock x:Name="StatusTextBlock" Grid.Row="4" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="Green" Margin="5"/>
+
     </Grid>
 </Window>
