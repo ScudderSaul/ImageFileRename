@@ -94,10 +94,11 @@ namespace ImageFileRename
             }
         }
         List<string> PngFilesInFolder = new List<string>();
-        private PngObservable PngData = null;
+        private PngObservable PngData = new PngObservable(new List<string>());
         public async Task<bool> GetPngFilePathsInFolderAsync()
         {
-            PngFilesInFolder = new List<string>();
+            PngFilesInFolder.Clear();
+            PngData.Clear();
 
             string path = SourcePathTextBlock.Text;
             if (string.IsNullOrEmpty(path))
@@ -109,18 +110,19 @@ namespace ImageFileRename
             foreach (string PngFile in PngFiles)
             {
                 PngFilesInFolder.Add(PngFile);
+                PngData.Add(PngFile);
             }
-            PngData = new PngObservable(PngFilesInFolder);
 
             return true;
         }
 
         List<string> JpgFilesInFolder = new List<string>();
-        private JpgObservable JpgData = null;
+        private JpgObservable JpgData = new JpgObservable(new List<string>());
 
         public async Task<bool> GetJpgFilePathsInFolderAsync()
         {
-            JpgFilesInFolder = new List<string>();
+            JpgFilesInFolder.Clear();
+            JpgData.Clear();
 
             string path = SourcePathTextBlock.Text;
             if (string.IsNullOrEmpty(path))
@@ -132,8 +134,8 @@ namespace ImageFileRename
             foreach (string JpgFile in JpgFiles)
             {
                 JpgFilesInFolder.Add(JpgFile);
+                JpgData.Add(JpgFile);
             }
-            JpgData = new JpgObservable(JpgFilesInFolder);
 
             return true;
         }
@@ -142,14 +144,14 @@ namespace ImageFileRename
         {
             Binding PngBinding = new Binding();
             PngBinding.Source = PngData;
-            PngShowList.SetBinding(ItemsControl.ItemsSourceProperty, PngBinding); ;
+            PngShowList.SetBinding(ItemsControl.ItemsSourceProperty, PngBinding);
         }
 
         void ShowJpgList()
         {
             Binding JpgBinding = new Binding();
             JpgBinding.Source = JpgData;
-            JpgShowList.SetBinding(ItemsControl.ItemsSourceProperty, JpgBinding); ;
+            JpgShowList.SetBinding(ItemsControl.ItemsSourceProperty, JpgBinding);
         }
 
         // rename a file
@@ -359,37 +361,38 @@ namespace ImageFileRename
             ShowFormat();
         }
 
-        private void ShowListButton_OnClick(object sender, RoutedEventArgs e)
+        private async void ShowListButton_OnClick(object sender, RoutedEventArgs e)
         {
             if (PngCheck.IsChecked == true)
             {
                 JpgShowList.Visibility = Visibility.Collapsed;
-
                 PngShowList.Visibility = Visibility.Visible;
+                await GetPngFilePathsInFolderAsync();
                 ShowPngList();
             }
             if (JpgCheck.IsChecked == true)
             {
                 PngShowList.Visibility = Visibility.Collapsed;
                 JpgShowList.Visibility = Visibility.Visible;
+                await GetJpgFilePathsInFolderAsync();
                 ShowJpgList();
             }
         }
 
-        private void PngCheck_OnClick(object sender, RoutedEventArgs e)
+        private async void PngCheck_OnClick(object sender, RoutedEventArgs e)
         {
             JpgCheck.IsChecked = false;
             PngFilesInFolder.Clear();
-            GetPngFilePathsInFolderAsync();
+            await GetPngFilePathsInFolderAsync();
             ShowPngList();
             RenameButton.Content = "Rename All .png Files";
         }
 
-        private void JpgCheck_OnClick(object sender, RoutedEventArgs e)
+        private async void JpgCheck_OnClick(object sender, RoutedEventArgs e)
         {
             PngCheck.IsChecked = false;
             JpgFilesInFolder.Clear();
-            GetJpgFilePathsInFolderAsync();
+            await GetJpgFilePathsInFolderAsync();
             ShowJpgList();
             RenameButton.Content = "Rename All .jpg Files";
         }
