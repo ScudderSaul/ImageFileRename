@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
@@ -26,9 +27,6 @@ using MessageBox = System.Windows.MessageBox;
 using Path = System.Windows.Shapes.Path;
 
 
-
-
-
 namespace ImageFileRename
 {
     /// <summary>
@@ -37,87 +35,60 @@ namespace ImageFileRename
     public partial class MainWindow : Window
     {
         private Random _rnd = new Random();
+        private string _prefixName = "GenericPrefix";
+        private ObservableCollection<string> PngFilesInFolder = new();
+
+        private ObservableCollection<string> JpgFilesInFolder = new();
+
         public MainWindow()
         {
             InitializeComponent();
             ShowFormat();
             PngShowList.ItemsSource = PngFilesInFolder;
         }
-        private string _prefixName = "GenericPrefix";
+
         public string PrefixName
         {
-            get
-            {
-                return (_prefixName);
-            }
+            get => _prefixName;
             set
             {
                 _prefixName = value;
                 PrefixTextBox.Text = _prefixName;
             }
         }
-        List<string> PngFilesInFolder = new List<string>();
-        private PngObservable PngData = new PngObservable(new List<string>());
-        public async Task<bool> GetPngFilePathsInFolderAsync()
-        {
-            PngFilesInFolder.Clear();
-            PngData.Clear();
 
+        private async Task<bool> GetFilePathsInFolderAsync(string extension, ObservableCollection<string> fileCollection)
+        {
+            fileCollection.Clear();
             string path = SourcePathTextBlock.Text;
             if (string.IsNullOrEmpty(path))
             {
                 MessageBox.Show("Please select a folder path");
                 return false;
             }
-            string[] PngFiles = await Task.Run(() => System.IO.Directory.GetFiles(path, "*.png"));
-            foreach (string PngFile in PngFiles)
+
+            try
             {
-                PngFilesInFolder.Add(PngFile);
-                PngData.Add(PngFile);
+                string[] files = await Task.Run(() => Directory.GetFiles(path, $"*.{extension}"));
+                foreach (string file in files)
+                {
+                    fileCollection.Add(file);
+                }
+                return true;
             }
-
-            return true;
-        }
-
-        List<string> JpgFilesInFolder = new List<string>();
-        private JpgObservable JpgData = new JpgObservable(new List<string>());
-
-        public async Task<bool> GetJpgFilePathsInFolderAsync()
-        {
-            JpgFilesInFolder.Clear();
-            JpgData.Clear();
-
-            string path = SourcePathTextBlock.Text;
-            if (string.IsNullOrEmpty(path))
+            catch (Exception ex)
             {
-                MessageBox.Show("Please select a folder path");
+                MessageBox.Show($"Error retrieving files: {ex.Message}");
                 return false;
             }
-            string[] JpgFiles = await Task.Run(() => System.IO.Directory.GetFiles(path, "*.jpg"));
-            foreach (string JpgFile in JpgFiles)
-            {
-                JpgFilesInFolder.Add(JpgFile);
-                JpgData.Add(JpgFile);
-            }
-
-            return true;
         }
 
-        void ShowPngList()
+        private void ShowFileList(ObservableCollection<string> fileCollection, System.Windows.Controls.ListView listView)
         {
-            Binding PngBinding = new Binding();
-            PngBinding.Source = PngData;
-            PngShowList.SetBinding(ItemsControl.ItemsSourceProperty, PngBinding);
+            Binding binding = new Binding { Source = fileCollection };
+            listView.SetBinding(ItemsControl.ItemsSourceProperty, binding);
         }
 
-        void ShowJpgList()
-        {
-            Binding JpgBinding = new Binding();
-            JpgBinding.Source = JpgData;
-            JpgShowList.SetBinding(ItemsControl.ItemsSourceProperty, JpgBinding);
-        }
-
-        // rename a file
         public async Task RenameFileAsync(string oldName, string newName)
         {
             try
@@ -130,7 +101,7 @@ namespace ImageFileRename
             }
             catch (Exception e)
             {
-                System.Windows.MessageBox.Show(e.Message);
+                MessageBox.Show(e.Message);
             }
         }
 
@@ -139,7 +110,7 @@ namespace ImageFileRename
             int cnt = _rnd.Next(10000, 99999);
             string changedfilename = string.Empty;
 
-            if (PrefixTextBox.Text != "")
+            if (!string.IsNullOrEmpty(PrefixTextBox.Text))
             {
                 PrefixName = PrefixTextBox.Text;
             }
@@ -152,7 +123,7 @@ namespace ImageFileRename
             int totalFiles = 0;
             if (PngCheck.IsChecked == true)
             {
-                if (await GetPngFilePathsInFolderAsync() == false)
+                if (!await GetFilePathsInFolderAsync("png", PngFilesInFolder))
                 {
                     StatusTextBlock.Text = "Failed to get PNG files.";
                     return;
@@ -162,7 +133,7 @@ namespace ImageFileRename
 
             if (JpgCheck.IsChecked == true)
             {
-                if (await GetJpgFilePathsInFolderAsync() == false)
+                if (!await GetFilePathsInFolderAsync("jpg", JpgFilesInFolder))
                 {
                     StatusTextBlock.Text = "Failed to get JPG files.";
                     return;
@@ -176,36 +147,20 @@ namespace ImageFileRename
             {
                 foreach (var fff in PngFilesInFolder)
                 {
-                    if (DateTimeBox.IsChecked == true)
-                    {
-                        DateTime dt = DateTime.Now;
-                        string nd = (dt.Ticks % 10000L).ToString();
-                        cnt++;
-                        changedfilename = PrefixName + "_" + cnt.ToString() + "_" + nd;
-                    }
-                    else
-                    {
-                        if (CrcBox.IsChecked == true)
-                        {
-                            string crc = Crc(fff);
-                            changedfilename = PrefixName + "_" + crc;
-                        }
-                        else
-                        {
-                            changedfilename = PrefixName + "_" + cnt.ToString();
-                            cnt++;
-                        }
-                    }
-
+                    changedfilename = GenerateNewFileName(fff, ref cnt);
                     FileInfo inf = new FileInfo(fff);
-                    string npf = inf.DirectoryName + "\\" + changedfilename + ".png";
+                   
+
+                    // With these lines:
+                    string npf = System.IO.Path.Combine(inf.DirectoryName, $"{changedfilename}.png");
+                  
                     if (fff != npf)
                     {
                         await RenameFileAsync(fff, npf);
                     }
 
                     processedFiles++;
-                    RenameProgressBar.Value = (double)processedFiles / totalFiles * 100;
+                    UpdateProgressBar(processedFiles, totalFiles);
                 }
             }
 
@@ -213,36 +168,16 @@ namespace ImageFileRename
             {
                 foreach (var fff in JpgFilesInFolder)
                 {
-                    if (DateTimeBox.IsChecked == true)
-                    {
-                        DateTime dt = DateTime.Now;
-                        string nd = (dt.Ticks % 10000L).ToString();
-                        cnt++;
-                        changedfilename = PrefixName + "_" + cnt.ToString() + "_" + nd;
-                    }
-                    else
-                    {
-                        if (CrcBox.IsChecked == true)
-                        {
-                            string crc = Crc(fff);
-                            changedfilename = PrefixName + "_" + crc;
-                        }
-                        else
-                        {
-                            changedfilename = PrefixName + "_" + cnt.ToString();
-                            cnt++;
-                        }
-                    }
-
+                    changedfilename = GenerateNewFileName(fff, ref cnt);
                     FileInfo inf = new FileInfo(fff);
-                    string npf = inf.DirectoryName + "\\" + changedfilename + ".jpg";
+                    string npf = System.IO.Path.Combine(inf.DirectoryName, $"{changedfilename}.jpg");
                     if (fff != npf)
                     {
                         await RenameFileAsync(fff, npf);
                     }
 
                     processedFiles++;
-                    RenameProgressBar.Value = (double)processedFiles / totalFiles * 100;
+                    UpdateProgressBar(processedFiles, totalFiles);
                 }
             }
 
@@ -250,14 +185,45 @@ namespace ImageFileRename
             RenameProgressBar.Value = 0; // Reset the progress bar
         }
 
-        // chose a source folder path
+        private string GenerateNewFileName(string filePath, ref int cnt)
+        {
+            string changedfilename;
+            if (DateTimeBox.IsChecked == true)
+            {
+                DateTime dt = DateTime.Now;
+                string nd = (dt.Ticks % 10000L).ToString();
+                cnt++;
+                changedfilename = $"{PrefixName}_{cnt}_{nd}";
+            }
+            else if (CrcBox.IsChecked == true)
+            {
+                string crc = Crc(filePath);
+                changedfilename = $"{PrefixName}_{crc}";
+            }
+            else
+            {
+                changedfilename = $"{PrefixName}_{cnt}";
+                cnt++;
+            }
+
+            return changedfilename;
+        }
+
+        private void UpdateProgressBar(int processedFiles, int totalFiles)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                RenameProgressBar.Value = (double)processedFiles / totalFiles * 100;
+            });
+        }
+
         private void ChooseSource_OnClick(object sender, RoutedEventArgs e)
         {
             var dialog = new FolderBrowserDialog();
             dialog.ShowDialog();
             SourcePathTextBlock.Text = dialog.SelectedPath;
             ShowFormat();
-            GetPngFilePathsInFolderAsync();
+            GetFilePathsInFolderAsync("png", PngFilesInFolder);
         }
 
         private string _formatString = "Prefix_Count";
@@ -268,21 +234,17 @@ namespace ImageFileRename
             {
                 _formatString = "Prefix_crc";
             }
+            else if (DateTimeBox.IsChecked == true)
+            {
+                _formatString = "Prefix_ticks_cnt";
+            }
             else
             {
-                if (DateTimeBox.IsChecked == true)
-                {
-                    _formatString = "Prefix_ticks_cnt";
-                }
-                else
-                {
-                    _formatString = "Prefix_cnt";
-                }
+                _formatString = "Prefix_cnt";
             }
             FormatTextBox.Text = _formatString;
         }
 
-        // get file crc
         private string Crc(string path)
         {
             if (string.IsNullOrEmpty(path))
@@ -304,6 +266,7 @@ namespace ImageFileRename
 
             return textCrc.ToString();
         }
+
         private void CrcBox_OnChecked(object sender, RoutedEventArgs e)
         {
             DateTimeBox.IsChecked = false;
@@ -314,11 +277,13 @@ namespace ImageFileRename
         {
             ShowFormat();
         }
+
         private void DateTimeBox_OnChecked(object sender, RoutedEventArgs e)
         {
             CrcBox.IsChecked = false;
             ShowFormat();
         }
+
         private void DateTimeBox_OnUnchecked(object sender, RoutedEventArgs e)
         {
             ShowFormat();
@@ -330,15 +295,15 @@ namespace ImageFileRename
             {
                 JpgShowList.Visibility = Visibility.Collapsed;
                 PngShowList.Visibility = Visibility.Visible;
-                await GetPngFilePathsInFolderAsync();
-                ShowPngList();
+                await GetFilePathsInFolderAsync("png", PngFilesInFolder);
+                ShowFileList(PngFilesInFolder, PngShowList);
             }
             if (JpgCheck.IsChecked == true)
             {
                 PngShowList.Visibility = Visibility.Collapsed;
                 JpgShowList.Visibility = Visibility.Visible;
-                await GetJpgFilePathsInFolderAsync();
-                ShowJpgList();
+                await GetFilePathsInFolderAsync("jpg", JpgFilesInFolder);
+                ShowFileList(JpgFilesInFolder, JpgShowList);
             }
         }
 
@@ -346,8 +311,8 @@ namespace ImageFileRename
         {
             JpgCheck.IsChecked = false;
             PngFilesInFolder.Clear();
-            await GetPngFilePathsInFolderAsync();
-            ShowPngList();
+            await GetFilePathsInFolderAsync("png", PngFilesInFolder);
+            ShowFileList(PngFilesInFolder, PngShowList);
             RenameButton.Content = "Rename All .png Files";
         }
 
@@ -355,8 +320,8 @@ namespace ImageFileRename
         {
             PngCheck.IsChecked = false;
             JpgFilesInFolder.Clear();
-            await GetJpgFilePathsInFolderAsync();
-            ShowJpgList();
+            await GetFilePathsInFolderAsync("jpg", JpgFilesInFolder);
+            ShowFileList(JpgFilesInFolder, JpgShowList);
             RenameButton.Content = "Rename All .jpg Files";
         }
     }

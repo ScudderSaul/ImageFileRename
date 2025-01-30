@@ -25,7 +25,7 @@
                 <TextBlock Text="Source Folder" FontWeight="Bold"/>
             </GroupBox.Header>
             <StackPanel Orientation="Horizontal" Margin="5">
-                <Button x:Name="ChooseSource" Background="Goldenrod" Content="Choose Source Folder Path" Click="ChooseSource_OnClick" Height="30" Width="200"/>
+                <Button x:Name="ChooseSource" Background="Goldenrod" Content="Choose Source Folder Path" Click="ChooseSource_OnClick" Height="30" Width="200" ToolTip="Select the source folder containing the image files"/>
                 <TextBlock x:Name="SourcePathTextBlock" Width="280" Height="30" Margin="5,0,0,0" VerticalAlignment="Center"/>
             </StackPanel>
         </GroupBox>
@@ -36,7 +36,7 @@
                 <TextBlock Text="Prefix" FontWeight="Bold"/>
             </GroupBox.Header>
             <StackPanel Margin="5">
-                <TextBox x:Name="PrefixTextBox" Width="200" Height="30" HorizontalAlignment="Left" BorderBrush="DarkGreen" BorderThickness="1"/>
+                <TextBox x:Name="PrefixTextBox" Width="200" Height="30" HorizontalAlignment="Left" BorderBrush="DarkGreen" BorderThickness="1" ToolTip="Enter the prefix for the renamed files"/>
             </StackPanel>
         </GroupBox>
 
@@ -45,7 +45,7 @@
                 <TextBlock Text="Current Format" FontWeight="Bold"/>
             </GroupBox.Header>
             <StackPanel Margin="5">
-                <TextBox x:Name="FormatTextBox" Width="200" Height="30" HorizontalAlignment="Left" BorderBrush="DarkGreen" BorderThickness="1" IsReadOnly="True"/>
+                <TextBox x:Name="FormatTextBox" Width="200" Height="30" HorizontalAlignment="Left" BorderBrush="DarkGreen" BorderThickness="1" IsReadOnly="True" ToolTip="Displays the current format for renaming files"/>
             </StackPanel>
         </GroupBox>
 
@@ -55,15 +55,13 @@
                 <TextBlock Text="Rename Files" FontWeight="Bold"/>
             </GroupBox.Header>
             <StackPanel Margin="5">
-                <Button x:Name="RenameButton" FontSize="16" Width="220" Content="Rename All .png Files" Click="RenameButton_OnClick" Background="Goldenrod" Margin="0,0,0,5"/>
+                <Button x:Name="RenameButton" FontSize="16" Width="220" Content="Rename All .png Files" Click="RenameButton_OnClick" Background="Goldenrod" Margin="0,0,0,5" ToolTip="Rename all selected image files"/>
                 <StackPanel Orientation="Horizontal">
-                    <CheckBox x:Name="PngCheck" IsChecked="True" Content=".png" Click="PngCheck_OnClick" Margin="0,0,10,0"/>
-                    <CheckBox x:Name="JpgCheck" IsChecked="False" Content=".jpg" Click="JpgCheck_OnClick"/>
+                    <CheckBox x:Name="PngCheck" IsChecked="True" Content=".png" Click="PngCheck_OnClick" Margin="0,0,10,0" ToolTip="Select to rename PNG files"/>
+                    <CheckBox x:Name="JpgCheck" IsChecked="False" Content=".jpg" Click="JpgCheck_OnClick" ToolTip="Select to rename JPG files"/>
                 </StackPanel>
             </StackPanel>
         </GroupBox>
-
-
 
         <!-- Format Selection -->
         <GroupBox Grid.Row="2" Grid.Column="0" BorderBrush="DarkGreen" BorderThickness="1" Margin="5">
@@ -71,8 +69,8 @@
                 <TextBlock Text="Choose Format" FontWeight="Bold"/>
             </GroupBox.Header>
             <StackPanel Margin="5">
-                <CheckBox x:Name="CrcBox" Content="Use Format Prefix + crc" Checked="CrcBox_OnChecked" Unchecked="CrcBox_OnUnchecked" Background="Chartreuse" Margin="0,0,0,5"/>
-                <CheckBox x:Name="DateTimeBox" Content="Use Format Prefix + ticks%10000 + count" Checked="DateTimeBox_OnChecked" Unchecked="DateTimeBox_OnUnchecked" Background="Chartreuse"/>
+                <CheckBox x:Name="CrcBox" Content="Use Format Prefix + crc" Checked="CrcBox_OnChecked" Unchecked="CrcBox_OnUnchecked" Background="Chartreuse" Margin="0,0,0,5" ToolTip="Use CRC format for renaming"/>
+                <CheckBox x:Name="DateTimeBox" Content="Use Format Prefix + ticks%10000 + count" Checked="DateTimeBox_OnChecked" Unchecked="DateTimeBox_OnUnchecked" Background="Chartreuse" ToolTip="Use DateTime format for renaming"/>
             </StackPanel>
         </GroupBox>
 
@@ -82,7 +80,7 @@
                 <TextBlock Text="File List" FontWeight="Bold"/>
             </GroupBox.Header>
             <StackPanel Margin="5">
-                <Button x:Name="ShowListButton" Content="Show List" Click="ShowListButton_OnClick" Width="100" Margin="0,0,0,5"/>
+                <Button x:Name="ShowListButton" Content="Show List" Click="ShowListButton_OnClick" Width="100" Margin="0,0,0,5" ToolTip="Show the list of files"/>
                 <ListView x:Name="JpgShowList" Margin="2" Width="400" Visibility="Collapsed"/>
                 <ListView x:Name="PngShowList" Margin="2" Width="400" Visibility="Visible"/>
             </StackPanel>
