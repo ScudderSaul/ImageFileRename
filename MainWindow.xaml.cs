@@ -315,6 +315,8 @@ namespace ImageFileRename
         {
             if (PngCheck?.IsChecked == true) yield return "png";
             if (JpgCheck?.IsChecked == true) yield return "jpg";
+            // Added mp4 support
+            if (Mp4Check?.IsChecked == true) yield return "mp4";
         }
 
         private bool ValidateConfiguration(out string error)

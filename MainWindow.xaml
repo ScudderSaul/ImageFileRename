@@ -33,8 +33,11 @@
                     <CheckBox x:Name="PngCheck" Content=".png" IsChecked="True" Margin="10,0,4,0"
                               ToolTip="Include PNG files in preview / rename"
                               Click="FileTypeCheckBox_OnClick"/>
-                    <CheckBox x:Name="JpgCheck" Content=".jpg" IsChecked="False" Margin="0,0,10,0"
+                    <CheckBox x:Name="JpgCheck" Content=".jpg" IsChecked="False" Margin="0,0,4,0"
                               ToolTip="Include JPG files in preview / rename"
+                              Click="FileTypeCheckBox_OnClick"/>
+                    <CheckBox x:Name="Mp4Check" Content=".mp4" IsChecked="False" Margin="0,0,10,0"
+                              ToolTip="Include MP4 video files in preview / rename"
                               Click="FileTypeCheckBox_OnClick"/>
                 </StackPanel>
             </DockPanel>
